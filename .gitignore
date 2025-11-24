@@ -1,0 +1,28 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*.log
+*.pth
+*.pkl
+*.pt
+*.onnx
+.DS_Store
+
+# Virtual environments
+venv/
+.env/
+.venv/
+
+# Logs and outputs
+*.log
+
+# Tensorboard logs
+runs/*
+!runs/**/*.ipynb
+
+# Weights and Biases files
+wandb/
+
+# Parquet files
+*.parquet
+
