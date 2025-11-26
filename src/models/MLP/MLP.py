@@ -9,6 +9,8 @@ This is incredibly crude and just a starting point.
 import torch
 import torch.nn as nn
 
+from ..auxiliary import get_activation
+
 #endregion
 
 #region MLP Class
@@ -47,4 +49,5 @@ class MLP(nn.Module):
 
         # Return the forward prop
         return self.mlp(input_tensor)
-        
+
+#endregion
