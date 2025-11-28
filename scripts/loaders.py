@@ -1,5 +1,6 @@
 from ..src.models.NIF import NIF
 from ..src.models.MLP import MLP
+from ..src.models.FNO import FNO
 from ..src.utils import loss as custom_losses
 
 import torch.optim as optim
@@ -15,6 +16,9 @@ def load_model(cfg_model_setup):
     
     elif hasattr(NIF, model_type):
         model_cls = getattr(NIF, model_type)
+
+    elif hasattr(FNO, model_type):
+        model_cls = getattr(FNO, model_type)
 
     else:
         raise ValueError(f"Unknown/Unsupported model type: {model_type}")

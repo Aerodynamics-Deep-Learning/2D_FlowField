@@ -17,7 +17,7 @@ class FNO_nD(nn.Module):
     def __init__(
         self, cfg_p:(dict), cfg_q:(dict), 
         fb_hidden_channels:(list[int]), fb_modes:(list[list[int]]), fb_kernel:(list[int]),
-        fb_norm_weights:(str)='geom', fb_norm_fft:(str)='ortho', fb_factorization:(str)= None, 
+        fb_norm_weights:(str)='geom', fb_norm_fft:(str)='ortho', fb_factorization:(str)=None, 
         fb_rank:(any)=None, fb_locallin_type:(str)='conv', fb_act_fn:(str)='gelu', 
         fb_norm_type:(str)='instance', fb_dropout:(float)=0.05, fb_use_mlp:(bool)=True, 
         fb_mlp_expansion:(int)=2, fb_stabilizer:(str)='tanh', fb_use_skip:(bool)=True
@@ -63,6 +63,24 @@ class FNO_nD(nn.Module):
         assert len(fb_kernel) == len(fb_modes), 'Fourier Block kernel and modes lists have to be same len.'
         assert len(fb_hidden_channels) + 1 == len(fb_kernel), 'Hidden channel list has to be 1 less than kernel list in ken.'
 
+        # Define for easier inputs
+        FourierBlock_dict = {
+            'norm_weights': fb_norm_weights, 
+            'norm_fft': fb_norm_fft,
+            'factorization': fb_factorization,
+            'rank': fb_rank,
+            'locallin_type': fb_locallin_type, 
+            'act_fn': fb_act_fn, 
+            'norm_type': fb_norm_type,
+            'dropout': fb_dropout, 
+            'use_mlp': fb_use_mlp, 
+            'mlp_expansion': fb_mlp_expansion,
+            'stabilizer': fb_stabilizer, 
+            'use_skip': fb_use_skip,
+            'factorization': fb_factorization,
+            'rank': fb_rank
+        }
+
         # Build Fourier Block, init block
         self.FourierBlock = [
             FourierBlockND(
@@ -70,66 +88,33 @@ class FNO_nD(nn.Module):
                 out_channels=fb_hidden_channels[0], 
                 modes=fb_modes[0],
                 kernel=fb_kernel[0], 
-                norm_weights=fb_norm_weights, 
-                norm_fft=fb_norm_fft,
-                factorization=fb_factorization,
-                rank=fb_rank,
-                locallin_type=fb_locallin_type, 
-                act_fn=fb_act_fn, 
-                norm_type=fb_norm_type,
-                dropout=fb_dropout, 
-                use_mlp=fb_use_mlp, 
-                mlp_expansion=fb_mlp_expansion,
-                stabilizer=fb_stabilizer, 
-                use_skip=fb_use_skip
+                **FourierBlock_dict
             )
         ]
 
         # Additional blocks
         for i in range(len(fb_hidden_channels) - 1):
 
-            self.FourierBlock.extend([
+            self.FourierBlock.append(
                 FourierBlockND(
                     in_channels=fb_hidden_channels[i], 
                     out_channels=fb_hidden_channels[i+1], 
                     modes=fb_modes[i+1],
                     kernel=fb_kernel[i+1],
-                    norm_weights=fb_norm_weights, 
-                    norm_fft=fb_norm_fft,
-                    factorization=fb_factorization,
-                    rank=fb_rank,
-                    locallin_type=fb_locallin_type, 
-                    act_fn=fb_act_fn, 
-                    norm_type=fb_norm_type,
-                    dropout=fb_dropout, 
-                    use_mlp=fb_use_mlp, 
-                    mlp_expansion=fb_mlp_expansion,
-                    stabilizer=fb_stabilizer, 
-                    use_skip=fb_use_skip
+                    **FourierBlock_dict
                 )
-            ])
+            )
 
         # Last block
-        self.FourierBlock.extend([
+        self.FourierBlock.append(
                 FourierBlockND(
                     in_channels=fb_hidden_channels[-1], 
                     out_channels=self.fb_out, 
                     modes=fb_modes[-1],
                     kernel=fb_kernel[-1],
-                    norm_weights=fb_norm_weights, 
-                    norm_fft=fb_norm_fft, 
-                    factorization=fb_factorization,
-                    rank=fb_rank,
-                    locallin_type=fb_locallin_type, 
-                    act_fn=fb_act_fn, 
-                    norm_type=fb_norm_type,
-                    dropout=fb_dropout, 
-                    use_mlp=fb_use_mlp, 
-                    mlp_expansion=fb_mlp_expansion,
-                    stabilizer=fb_stabilizer, 
-                    use_skip=fb_use_skip
+                    **FourierBlock_dict
                 )
-            ])
+            )
 
         self.FourierBlock = nn.Sequential(*self.FourierBlock)
 

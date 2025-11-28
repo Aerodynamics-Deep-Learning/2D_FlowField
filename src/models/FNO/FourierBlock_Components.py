@@ -30,6 +30,8 @@ class SpectralConvolutionND(nn.Module):
         modes: is the number of Fourier modes to keep in the layer, given as a list of ints of size n
         norm_weights: option to normalizing weights; "paper" (1/ch1 * ch2), "geom" (1/(ch1 * ch2)**0.5), "xavier" ((2/(ch1 + ch2))**0.5)
         norm_fft: option to normalizing signal; "forward" (none), "backward" (1/n), "ortho" (1/sqrt(n))
+        factorization: option to factorize the spectral weights; None (no factorization), "cp" (CANDECOMP/PARAFAC), "tucker" (Tucker decomposition)
+        rank: rank for the factorization, int for cp, list of ints for tucker
 
     Returns:
         x: spectrally convoluted n-D signal

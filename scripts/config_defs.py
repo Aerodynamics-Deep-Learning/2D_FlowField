@@ -1,8 +1,7 @@
 import os
 import argparse
 import yaml
-
-import torch
+from .auxiliary import avoid_MKL_bug
 
 def cfg_from_args():
     """
@@ -48,6 +47,11 @@ def parse_cfg_dict(cfg_run):
     cfg_optim_setup = cfg_run['cfg_optim_setup']
     cfg_loss_setup = cfg_run['cfg_loss_setup']
 
+    avoid_MKL_bug(cfg_model_setup['model_type'])
+    # PyTorch is safe to import now
+
+    import torch
+
     # Dtype config
     dtype_str = cfg_train['dtype']
     dtype_map = {
@@ -56,6 +60,7 @@ def parse_cfg_dict(cfg_run):
         'float32': torch.float32,
         'float64': torch.float64
     }
+
     if dtype_str not in dtype_map:
         raise ValueError(f"Unknown/Unsupported dtype: {dtype_str}. Choose one of: 'float16', 'bfloat16', 'float32', 'float64'")
     cfg_train['dtype'] = dtype_map[dtype_str]
